@@ -13,10 +13,8 @@ def transfer(token, address1, address2, item_id=0):
 def main():
     deployerAddress = get_account()
     resonance_token = Resonance.deploy({"from":deployerAddress})
-    
-    txn_mint = resonance_token.mint(7, {"from":deployerAddress})
-    txn_mint.wait(1)
     item_id = resonance_token.item_counter()
+    
     if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         artistAddress = get_account(1)
         transfer(resonance_token, deployerAddress, artistAddress, item_id=item_id)

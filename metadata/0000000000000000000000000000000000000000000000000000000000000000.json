@@ -3,6 +3,9 @@
     "image" : "ipfs://QmP5MBJ29em9REeF11gn2YWqPMy58s9zGh7Au2ynaNtean/Dance_with_Divine.png",
     "name" : "Blessed Album",
     "attributes" : [
-        {"popularity" : 0}
+        {
+            "trait_type": "popularity",
+            "value" : 0
+        }
     ]
 }
