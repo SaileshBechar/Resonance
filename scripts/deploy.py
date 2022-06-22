@@ -12,7 +12,7 @@ def transfer(token, address1, address2, item_id=0):
 
 def main():
     deployerAddress = get_account()
-    resonance_token = Resonance.deploy({"from":deployerAddress})
+    resonance_token = Resonance.deploy(6940, {"from":deployerAddress})
     item_id = resonance_token.item_counter()
     
     if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:

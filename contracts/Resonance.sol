@@ -40,10 +40,10 @@ contract Resonance is ERC1155, Ownable, VRFConsumerBaseV2 {
     address s_owner;
 
     enum Scarcity{COMMON, RARE, ULTRA_RARE}
-    mapping(uint256 => Scarcity) public tokenIdToScarcity;
+    mapping(uint256 => Scarcity) public itemIdToScarcity;
     mapping(uint256 => address) public requestIdToSender;
     event requestedCollectible(uint256 indexed requestId, address requester);
-    event scarcityAssigned(uint256 indexed tokenId, Scarcity scarcity);
+    event scarcityAssigned(uint256 indexed itemId, Scarcity scarcity);
 
     constructor(uint64 subscriptionId) ERC1155("ipfs://QmPNJWNFpw3JyMjPEjN7XzJ2ivxo4SuZ24u2f9Kav3rdHj/{id}.json") VRFConsumerBaseV2(vrfCoordinator){
         item_counter = 0;
@@ -51,9 +51,11 @@ contract Resonance is ERC1155, Ownable, VRFConsumerBaseV2 {
         COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
         s_owner = msg.sender;
         s_subscriptionId = subscriptionId;
+        _mint(msg.sender, 0, 1000, ""); // Mint 1000 of Artist's currency
+        item_counter += 1;
     }
 
-    function mint(uint256 amount) public onlyOwner returns(uint256) {
+    function mint() public onlyOwner returns(uint256) {
         s_requestId = COORDINATOR.requestRandomWords(
             keyHash,
             s_subscriptionId,
@@ -65,7 +67,7 @@ contract Resonance is ERC1155, Ownable, VRFConsumerBaseV2 {
         emit requestedCollectible(s_requestId, msg.sender);
     }
 
-    function randomToScarcity(uint256 randomNum) public returns(int8) {
+    function randomToScarcity(uint256 randomNum) public returns(Scarcity) {
         // TODO: make function view?
         if (randomNum < 1){
             return Scarcity(2);
@@ -82,14 +84,19 @@ contract Resonance is ERC1155, Ownable, VRFConsumerBaseV2 {
         uint256 requestId, /* requestId */
         uint256[] memory randomWords
     ) internal override {
-        uint32 randomNum = randomWords[0] % 1000;
-        Scarcity scarcity = randomToScarcity(randomNum);
-        
-        uint256 newTokenId = item_counter;
-        tokenIdToScarcity[newTokenId] = scarcity; // Can change this stuff from tokenId
-        emit scarcityAssigned(newTokenId, scarcity);
+        // Calculate scarcity of non-fungible artwork
+        uint256 randomScarcity = randomWords[0] % 1000;
+        Scarcity scarcity = randomToScarcity(randomScarcity);
+        itemIdToScarcity[item_counter] = scarcity;
+        emit scarcityAssigned(item_counter, scarcity);
         address owner = requestIdToSender[requestId];
-        _mint(owner, item_counter, 1, ""); // TODO: somehow pass token amount to this
+        _mint(owner, item_counter, 1, "");
         item_counter += 1;
+
+        // Calculate if minter should be dropped 1 currency of artist
+        uint256 randomDrop = randomWords[1] % 2;  // 50% chance
+        if (randomDrop < 1) {
+            safeTransferFrom(address(this), owner, 0, 1, "0x0"); // Artist currency has ID = 0
+        }
     }
 }
