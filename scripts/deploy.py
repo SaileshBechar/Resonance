@@ -12,7 +12,7 @@ def transfer(token, address1, address2, item_id=0):
 
 def main():
     deployerAddress = get_account()
-    resonance_token = Resonance.deploy(6940, {"from":deployerAddress})
+    resonance_token = Resonance.deploy({"from":deployerAddress}, publish_source=True)
     item_id = resonance_token.item_counter()
     
     if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
@@ -20,4 +20,4 @@ def main():
         transfer(resonance_token, deployerAddress, artistAddress, item_id=item_id)
     else:
         print(f'The contract has been successfully deployed at https://testnets.opensea.io/assets/rinkeby/{resonance_token}/{item_id}')
-    print(resonance_token.uri(item_id))
+        print(f"Subscription Manager: https://vrf.chain.link/rinkeby/{resonance_token.s_subscriptionId()}")

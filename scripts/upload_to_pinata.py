@@ -4,10 +4,10 @@ import os, requests
 def main():
     PINATA_BASE_URL = "https://api.pinata.cloud/"
     endpoint = "pinning/pinFileToIPFS"
-    file_path="./img/Dance_with_Divine.png"
+    file_path="./img/DWDM-ultra_rare.png"
     file_name = file_path.split('/')[-1:][0]
     headers = {
-        "pinata_api_key" : os.getenv("PINATA_API"), 
+        "pinata_api_key" : os.getenv("PINATA_API_KEY"), 
         "pinata_secret_api_key" : os.getenv("PINATA_SECRET")
     }
     with Path(file_path).open("rb") as fp:

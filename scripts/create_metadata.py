@@ -1,17 +1,21 @@
-from brownie import Resonance, network
-from scripts.helpful_scripts import get_account, fund_with_link, get_scarcity
-from metadata.sample_metadata import metadata_template
+from brownie import Resonance, network, config
+from scripts.helpful_scripts import get_account, get_scarcity
+from metadata.sample_metadata import metadata_template, currency_template
 from pathlib import Path
-import random
 import requests
 import os
+import json
+
+scarcity_to_img_uri= {
+    "COMMON" : "https://ipfs.io/ipfs/QmXTjbcPzZTiXCqZ287FgzXafGrepEbvzmVFhAnRbitBdC?filename=DWDM-common.png",
+    "RARE" : "https://ipfs.io/ipfs/QmRjMWfDdFZy5ySLhAn4nzH1eUgfJeDMkmmW7LspQbdZip?filename=DWDM-rare.png",
+    "ULTRA_RARE" : "https://ipfs.io/ipfs/QmbNtkaH67nh45eLfsJ4F2cndaDHudQqZ3HRqKSV95Jq3d?filename=DWDM-ultra_rare.png"
+}
 
 def main():
     deployerAddress = get_account()
     resonance_token = Resonance[len(Resonance)-1]
     for item_id in range(resonance_token.item_counter()):
-        if (item_id == 0):
-            continue
         scarcity = get_scarcity(resonance_token.tokenIdToScarcity(item_id))
         print(scarcity)
         item_id_hex = hex(item_id)[2:]
@@ -19,17 +23,47 @@ def main():
             f'./metadata/{network.show_active()}/{item_id_hex.zfill(64)}.json'
         )
         artwork_metadata = metadata_template
-        popularity = random.randint(0,100)
+        popularity = get_popularity()
         if Path(metadata_file_name).exists():
             print(f'{metadata_file_name} already exists! Delete it to overwrite')
         else:
             print(f'Creating Metadata file: {metadata_file_name}')
-            artwork_metadata['attributes'][0]['value'] = popularity
-            artwork_metadata['attributes'][1]['value'] = scarcity
-            print(artwork_metadata)
-            img_path = (f'./img/Dance_with_Divine.png')
-            # img_uri = upload_to_ipfs(img_path)
-            upload_to_pinata(img_path)
+            if (item_id == 0):
+                artwork_metadata = currency_template
+                img_path = (f'./img/Currency.png')
+            else:
+                artwork_metadata['attributes'][0]['value'] = popularity
+                artwork_metadata['attributes'][1]['value'] = scarcity
+                print(artwork_metadata)
+                img_path = (f'./img/DWDM-{scarcity.lower()}.png')
+
+            img_uri = None
+            if os.getenv("UPLOAD_IPFS") == "true": # Upload image to IPFS
+                img_uri = upload_to_ipfs(img_path)
+                upload_to_pinata(img_path)
+            artwork_metadata["image"] = img_uri if img_uri else scarcity_to_img_uri[scarcity]
+
+            with open(metadata_file_name, "w") as file: # write metadata to json file
+                json.dump(artwork_metadata, file)
+            # Upload metadata to IPFS
+            upload_to_ipfs(metadata_file_name)
+            upload_to_pinata(metadata_file_name)
+
+# Get Artist's popularity from Spotify
+def get_popularity():
+    return 28
+    headers = {
+        'Authorization' : 'Basic ' + config["spotify"]["base64client"]
+    }
+    data = {'grant_type':'client_credentials'}
+    auth_response = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
+    authToken = auth_response.json()['access_token']
+    print(authToken)
+    headers = {
+        "Authorization: Bearer " + authToken
+    }
+    artist_response = requests.get('https://api.spotify.com/v1/artists/1ZtRTibAPAEbO8iydpyzWu', headers=headers)
+    print(artist_response.json()['popularity'])
 
 def upload_to_ipfs(file_path):
     with Path(file_path).open("rb") as fp:
