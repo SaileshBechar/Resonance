@@ -5,13 +5,19 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "./Queue.sol";
 
 
 contract Resonance is ERC1155, VRFConsumerBaseV2 {
+    using Queue for Queue.Uint256Queue;
+
     uint256 public item_counter;
 
     LinkTokenInterface LINKTOKEN;
     VRFCoordinatorV2Interface COORDINATOR;
+    
+    Queue.Uint256Queue txn_queue;
+    uint256 MAX_QUEUE_SIZE = 20;
 
     uint64 public s_subscriptionId;
 
@@ -43,16 +49,19 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
     enum Scarcity{COMMON, RARE, ULTRA_RARE}
     mapping(uint256 => Scarcity) public itemIdToScarcity;
     mapping(uint256 => address) public requestIdToSender;
+    mapping(uint256 => uint256) public itemIdToPopularity;
     event requestedCollectible(uint256 indexed requestId, address requester);
     event randomWordsGenerated(uint256[] randomNumbers);
     event scarcityAssigned(uint256 indexed itemId, Scarcity scarcity);
+    event defundContract(uint256 balance);
+    event popularityAssigned(uint256 indexed itemId, uint256 popularity);
 
     constructor() ERC1155("ipfs://QmPNJWNFpw3JyMjPEjN7XzJ2ivxo4SuZ24u2f9Kav3rdHj/{id}.json") VRFConsumerBaseV2(vrfCoordinator){
-        // TODO: change IPFS root
         item_counter = 0;
 
         COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
         LINKTOKEN = LinkTokenInterface(link_token_contract);
+        txn_queue.initialize();
         s_owner = msg.sender;
         createNewSubscription();
         
@@ -62,11 +71,7 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
     }
 
     /* Fund subscription and request random words */
-    function generateRandomWords() public {
-        
-        // 400000000000000000 = 0.4 LINK
-        LINKTOKEN.transferAndCall(address(COORDINATOR), 2000000000000000000, abi.encode(s_subscriptionId)); 
-        
+    function generateRandomWords() public {        
         s_requestId = COORDINATOR.requestRandomWords(
             keyHash,
             s_subscriptionId,
@@ -83,7 +88,6 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
         uint256[] memory randomWords
     ) internal override {
         randomNums = randomWords;
-        //TODO emit event when successful
         emit randomWordsGenerated(randomNums);
     }
 
@@ -102,22 +106,54 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
 
     /* Calculate scarcity of non-fungible artwork */
     function mint_nf_artwork(address owner) public {
-        // uint256 randomScarcity = randomNums[0] % 1000; // TODO: Uncomment for actual scarcity distribution
-        // Scarcity scarcity = randomToScarcity(randomScarcity);
+        if (txn_queue.length() >= MAX_QUEUE_SIZE){
+            txn_queue.dequeue();
+        } 
+        txn_queue.enqueue(block.number);
+
+        uint256 popularity = getPopularity();
+        itemIdToPopularity[item_counter] = popularity;
+        emit popularityAssigned(item_counter, popularity);
+        // Scarcity scarcity = randomToScarcity(randomNums[0] % 1000); // TODO: Uncomment for actual scarcity distribution
         Scarcity scarcity = Scarcity(randomNums[0] % 3);
         itemIdToScarcity[item_counter] = scarcity;
         emit scarcityAssigned(item_counter, scarcity);
-        _mint(owner, item_counter, 1, "");
+        _mint(owner, item_counter, 1, abi.encodePacked(popularity));
         item_counter += 1;
+
+        transfer_currency(owner);
+        
+    }
+
+    function getPopularity() public view returns(uint256) {
+        if (txn_queue.length() < 2){
+            return 0;
+        }
+        return block.number * txn_queue.length() * item_counter / (txn_queue.peekLast() - txn_queue.peek());
+    }
+
+    function peekFirst() public view returns(uint256) {
+        return txn_queue.peek();
+    }
+
+    function peekLast() public view returns(uint256) {
+        return txn_queue.peekLast();
+    }
+
+    function queueLen() public view returns(uint256) {
+        return txn_queue.length();
     }
     
     /* Calculate if minter should be dropped 1 currency of artist */
-    function transfer_currency(address owner) public {
-        // TODO: create mapping of owners to tokens
+    function transfer_currency(address owner) private {
         uint256 randomDrop = randomNums[1] % 2;  // 50% chance
-        if (randomDrop <= 1) {
-            safeTransferFrom(address(this), owner, 0, 1, "0x0"); // Artist currency has ID = 0
+        if (randomDrop < 1) {
+            _safeTransferFrom(address(this), owner, 0, 1, "0x0"); // Artist currency has ID = 0
         }
+    }
+
+    function setURI(string memory uri) external onlyOwner {
+        _setURI(uri);
     }
 
     // Create a new subscription when the contract is initially deployed.
@@ -137,6 +173,7 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
         // Cancel the subscription and send the remaining LINK to a wallet address.
         COORDINATOR.cancelSubscription(s_subscriptionId, receivingWallet);
         s_subscriptionId = 0;
+        emit defundContract(LINKTOKEN.balanceOf(address(this))); // Emit contract's balance of LINK
     }
 
     function withdraw(uint256 amount, address to) external onlyOwner {
