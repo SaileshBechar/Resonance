@@ -2,7 +2,7 @@ metadata_template = {
     "name" : "Dancing with Divine Mother",
     "description" : "Dance through life knowing Divine Mother is ever-guiding you back to Her",
     "image" : "",
-    "attributes" : [{"trait_type":"popularity", "value" : 100, "max_value" : 100}, {"trait_type":"Scarcity", "value" : ""}]
+    "attributes" : [{"trait_type":"popularity", "value" : 0}, {"trait_type":"Scarcity", "value" : ""}, {"trait_type":"Item Number", "value" : ""}]
 }
 
 currency_template = {

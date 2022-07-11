@@ -9,7 +9,7 @@ def main():
     tx_cancel = resonance_token.cancelSubscription(deployerAddress, {"from":deployerAddress})
     
     link_token_address = config["networks"][network.show_active()]["link_token"]
-    balance = tx_cancel.events['defundContract']
+    balance = tx_cancel.events['defundContract']['balance']
     print("Remaining balance", balance)
     tx = interface.LinkTokenInterface(link_token_address).transfer(
         deployerAddress, balance, {"from": deployerAddress}

@@ -40,6 +40,7 @@ def main():
             else:
                 artwork_metadata['attributes'][0]['value'] = popularity
                 artwork_metadata['attributes'][1]['value'] = scarcity
+                artwork_metadata['attributes'][2]['value'] = item_id
                 print(artwork_metadata)
                 img_path = (f'./img/DWDM-{scarcity.lower()}.png')
 

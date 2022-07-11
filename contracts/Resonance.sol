@@ -16,8 +16,10 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
     LinkTokenInterface LINKTOKEN;
     VRFCoordinatorV2Interface COORDINATOR;
     
-    Queue.Uint256Queue txn_queue;
-    uint256 MAX_QUEUE_SIZE = 20;
+    Queue.Uint256Queue delta_queue;
+    uint256 public delta_sum = 0;
+    uint256 public prev_block = 0;
+    uint256 MAX_QUEUE_SIZE = 50;
 
     uint64 public s_subscriptionId;
 
@@ -61,7 +63,7 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
 
         COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
         LINKTOKEN = LinkTokenInterface(link_token_contract);
-        txn_queue.initialize();
+        delta_queue.initialize();
         s_owner = msg.sender;
         createNewSubscription();
         
@@ -79,8 +81,6 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
             callbackGasLimit,
             numWords
         );
-        requestIdToSender[s_requestId] = msg.sender; // Create mapping from owner to random words for minting
-        emit requestedCollectible(s_requestId, msg.sender);
     }
 
     function fulfillRandomWords(
@@ -96,7 +96,7 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
         if (randomNum < 1){
             return Scarcity(2);
         }
-        else if (randomNum < 100){
+        else if (randomNum < 50){
             return Scarcity(1);
         }
         else{
@@ -105,51 +105,57 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
     }
 
     /* Calculate scarcity of non-fungible artwork */
-    function mint_nf_artwork(address owner) public {
-        if (txn_queue.length() >= MAX_QUEUE_SIZE){
-            txn_queue.dequeue();
-        } 
-        txn_queue.enqueue(block.number);
+    function mint_nf_artwork() public {
+        if (delta_queue.length() >= MAX_QUEUE_SIZE){
+            delta_sum -= delta_queue.dequeue();
+        }
+        if (prev_block > 0) {
+            delta_queue.enqueue(block.number - prev_block);
+            delta_sum += block.number - prev_block;
+        }
+        prev_block = block.number;
 
         uint256 popularity = getPopularity();
         itemIdToPopularity[item_counter] = popularity;
         emit popularityAssigned(item_counter, popularity);
-        // Scarcity scarcity = randomToScarcity(randomNums[0] % 1000); // TODO: Uncomment for actual scarcity distribution
+        // Scarcity scarcity = randomToScarcity(randomNums[0] % 500); // TODO: Uncomment for actual scarcity distribution
         Scarcity scarcity = Scarcity(randomNums[0] % 3);
         itemIdToScarcity[item_counter] = scarcity;
         emit scarcityAssigned(item_counter, scarcity);
-        _mint(owner, item_counter, 1, abi.encodePacked(popularity));
+        _mint(msg.sender, item_counter, 1, abi.encodePacked(popularity));
         item_counter += 1;
 
-        transfer_currency(owner);
+        transfer_currency();
         
     }
 
     function getPopularity() public view returns(uint256) {
-        if (txn_queue.length() < 2){
+        if (delta_queue.length() <= 1){
             return 0;
         }
-        return block.number * txn_queue.length() * item_counter / (txn_queue.peekLast() - txn_queue.peek());
-    }
-
-    function peekFirst() public view returns(uint256) {
-        return txn_queue.peek();
-    }
-
-    function peekLast() public view returns(uint256) {
-        return txn_queue.peekLast();
-    }
-
-    function queueLen() public view returns(uint256) {
-        return txn_queue.length();
+        uint256 avg_delta = delta_sum / delta_queue.length();
+        return (15000000 / avg_delta) + (item_counter * 1000000 / avg_delta);
     }
     
     /* Calculate if minter should be dropped 1 currency of artist */
-    function transfer_currency(address owner) private {
+    function transfer_currency() private {
         uint256 randomDrop = randomNums[1] % 2;  // 50% chance
         if (randomDrop < 1) {
-            _safeTransferFrom(address(this), owner, 0, 1, "0x0"); // Artist currency has ID = 0
+            _safeTransferFrom(address(this), msg.sender, 0, 1, "0x0"); // Artist currency has ID = 0
         }
+    }
+
+    /* The following queue functions are used for debugging purposes */
+    function peekFirst() public view returns(uint256) {
+        return delta_queue.peek();
+    }
+
+    function peekLast() public view returns(uint256) {
+        return delta_queue.peekLast();
+    }
+
+    function queueLen() public view returns(uint256) {
+        return delta_queue.length();
     }
 
     function setURI(string memory uri) external onlyOwner {

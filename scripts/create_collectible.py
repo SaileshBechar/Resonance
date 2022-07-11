@@ -13,7 +13,7 @@ def main():
     generateRandomNums(deployerAddress, resonance_token)
 
     # 3. Mint Non-Fungible Token and Transfer Fungible Token
-    tx_mint = resonance_token.mint_nf_artwork(deployerAddress, {"from":deployerAddress})
+    tx_mint = resonance_token.mint_nf_artwork({"from":deployerAddress})
     tx_mint.wait(1)
     print(f"You have created {resonance_token.item_counter()} tokens")
 
