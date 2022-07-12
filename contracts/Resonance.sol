@@ -58,7 +58,7 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
     event defundContract(uint256 balance);
     event popularityAssigned(uint256 indexed itemId, uint256 popularity);
 
-    constructor() ERC1155("ipfs://QmPNJWNFpw3JyMjPEjN7XzJ2ivxo4SuZ24u2f9Kav3rdHj/{id}.json") VRFConsumerBaseV2(vrfCoordinator){
+    constructor(address vrfCoordinator, address link_token_contract, bytes32 keyHash) ERC1155("ipfs://QmPNJWNFpw3JyMjPEjN7XzJ2ivxo4SuZ24u2f9Kav3rdHj/{id}.json") VRFConsumerBaseV2(vrfCoordinator){
         item_counter = 0;
 
         COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
