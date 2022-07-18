@@ -16,7 +16,7 @@ def deploy_resonance():
         config["networks"][network.show_active()]['vrf_coordinator'],
         config["networks"][network.show_active()]['link_token'],
         config["networks"][network.show_active()]['key_hash'],
-        {"from":deployerAddress}, publish_source=True)
+        {"from":deployerAddress}, publish_source=config["networks"][network.show_active()]['verify'])
     item_id = resonance_token.item_counter()
     
     if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
