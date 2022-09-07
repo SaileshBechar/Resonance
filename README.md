@@ -1,4 +1,4 @@
 # Resonance
-ERC-1155 Smart Contracts with Chainlink Data Feeds
+ERC-1155 Smart Contract using Chainlink's VRF and on-chain Popularity Score
 
-![report](ECE_499.pdf)
+[Link to Project Report](ECE_499.pdf)
