@@ -54,8 +54,7 @@ python3 -m pipx ensurepath</code></pre>
 												<p>May need to restart terminal before the next steps</p>
 												<pre><code>pipx install eth-brownie
 pip install py-solc-x
-pip install python-dotenv
-pip install pytest</code></pre>
+pip install python-dotenv</code></pre>
 											</li>
 											<li>
 												<p>Get 0.1 testnet Goerli ETH and 20 testnet LINK from a <a href="https://faucets.chain.link/">faucet</a></p>
@@ -84,7 +83,15 @@ pip install pytest</code></pre>
 											</li>
 											<li>
 												<p>Run the experiments from the project directory</p>
-												<pre><code>brownie test \scripts</code></pre>
+												<pre><code>brownie test</code></pre>
+											</li>
+											<li>
+												<p>
+													Alternatively, just run the unit test
+												</p>
+												<pre><code>brownie test -k test_can_create_and_cleanup_collectible</code></pre>
+												<p>and the Popularity test</p>
+												<pre><code>brownie test -k test_popularity</code></pre>
 											</li>
 										</ul>
 									</div>
