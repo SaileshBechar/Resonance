@@ -21,15 +21,15 @@
 					<header id="header" class="alt">
 						<!-- <span class="logo"><img src="images/logo.svg" alt="" /></span> -->
 						<h1>Resonance</h1>
-						<p>Smart Contracts for Music Artists<br />
-						Sailesh Bechar</p>
+						<p>Smart Contracts for Music Artists</p>
 					</header>
 
 				<!-- Nav -->
 					<nav id="nav">
 						<ul>
 							<li><a href="#intro" class="active">Instructions</a></li>
-							<li><a href="ECE_499.pdf">Paper</a></li>
+							<li><a href="https://github.com/SaileshBechar/Resonance">Source Code</a></li>
+							<li><a href="Resonance - ERC-1155 Tokens for Music Artists.pdf">Paper</a></li>
 						</ul>
 					</nav>
 
@@ -42,18 +42,26 @@
 									<div class="content">
 										<header class="major">
 											<h2>Installation and Setup</h2>
-										</header>
-										<p>Installing <a href="https://eth-brownie.readthedocs.io/en/stable/install.html">Brownie</a></p>
-										<pre><code>python3 -m pip install --user pipx
+										</header>										
+										<ul>
+											<li>
+												<p>Install the latest version of <a href="https://www.python.org/downloads/">Python 3</a></p>
+											</li>
+											<li>
+												<p>Install <a href="https://eth-brownie.readthedocs.io/en/stable/install.html">Brownie</a></p>
+												<pre><code>python3 -m pip install --user pipx
 python3 -m pipx ensurepath</code></pre>
-										<p>May need to restart terminal before the next steps</p>
-										<pre><code>pipx install eth-brownie
+												<p>May need to restart terminal before the next steps</p>
+												<pre><code>pipx install eth-brownie
 pip install py-solc-x
-pip install python-dotenv</code></pre>
-										<p>Get 2 Goerli testnet ETH and 1 testnet LINK from a <a href="https://faucets.chain.link/">faucet</a></p>
-											<!-- <ul class="actions">
-											<li><a href="generic.html" class="button">Learn More</a></li>
-										</ul> -->
+pip install python-dotenv
+pip install pytest</code></pre>
+											</li>
+											<li>
+												<p>Get 0.1 testnet Goerli ETH and 20 testnet LINK from a <a href="https://faucets.chain.link/">faucet</a></p>
+											</li>
+										</ul>
+										
 									</div>
 									<!-- <span class="image"><img src="images/pic01.jpg" alt="" /></span> -->
 								</div>
@@ -66,17 +74,23 @@ pip install python-dotenv</code></pre>
 										<header class="major">
 											<h2>Running the code</h2>
 										</header>
-										<p>1. Clone the repo</p>
-										<p>2. Create a .env file</p>
-										<pre><code>PRIVATE_KEY=your wallet private key here</code></pre>
-										<pre><code>pipx install eth-brownie</code></pre>
-										<!-- <ul class="actions">
-											<li><a href="generic.html" class="button">Learn More</a></li>
-										</ul> -->
+										<ul>
+											<li>
+												<p>Clone <a href="https://github.com/SaileshBechar/Resonance">https://github.com/SaileshBechar/Resonance</a></p>
+											</li>
+											<li>
+												<p>Create a .env file with contents:</p>
+												<pre><code>PRIVATE_KEY=your wallet private key here</code></pre>
+											</li>
+											<li>
+												<p>Run the experiments from the project directory</p>
+												<pre><code>brownie test \scripts</code></pre>
+											</li>
+										</ul>
 									</div>
 									<!-- <span class="image"><img src="images/pic01.jpg" alt="" /></span> -->
 								</div>
-								<footer class="major">
+								<footer class="major" style="opacity: 0%;">
 									<ul class="actions special">
 										<li><a href="generic.html" class="button primary">Get Started</a></li>
 										<li><a href="generic.html" class="button">Learn More</a></li>
@@ -89,31 +103,16 @@ pip install python-dotenv</code></pre>
 				<!-- Footer -->
 					<footer id="footer">
 						<section>
-							<h2>Aliquam sed mauris</h2>
-							<p>Sed lorem ipsum dolor sit amet et nullam consequat feugiat consequat magna adipiscing tempus etiam dolore veroeros. eget dapibus mauris. Cras aliquet, nisl ut viverra sollicitudin, ligula erat egestas velit, vitae tincidunt odio.</p>
-							<ul class="actions">
-								<li><a href="generic.html" class="button">Learn More</a></li>
-							</ul>
-						</section>
-						<section>
-							<h2>Etiam feugiat</h2>
+							<h2>Contact</h2>
 							<dl class="alt">
-								<dt>Address</dt>
-								<dd>1234 Somewhere Road &bull; Nashville, TN 00000 &bull; USA</dd>
-								<dt>Phone</dt>
-								<dd>(000) 000-0000 x 0000</dd>
 								<dt>Email</dt>
-								<dd><a href="#">information@untitled.tld</a></dd>
+								<dd><a href="#">sbechar@uwaterloo.ca</a></dd>
 							</dl>
-							<ul class="icons">
-								<li><a href="#" class="icon brands fa-twitter alt"><span class="label">Twitter</span></a></li>
-								<li><a href="#" class="icon brands fa-facebook-f alt"><span class="label">Facebook</span></a></li>
-								<li><a href="#" class="icon brands fa-instagram alt"><span class="label">Instagram</span></a></li>
-								<li><a href="#" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
-								<li><a href="#" class="icon brands fa-dribbble alt"><span class="label">Dribbble</span></a></li>
+							<ul class="icons" style="margin-top: -35px;">
+								<li><a href="https://github.com/SaileshBechar" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
 							</ul>
 						</section>
-						<p class="copyright">&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+						<p class="copyright">&copy; Sailesh Bechar. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 
 			</div>
