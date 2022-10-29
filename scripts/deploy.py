@@ -23,8 +23,8 @@ def deploy_resonance():
         artistAddress = get_account(1)
         test_transfer(resonance_token, deployerAddress, artistAddress, item_id=item_id)
     else:
-        print(f'The contract has been successfully deployed at https://testnets.opensea.io/assets/rinkeby/{resonance_token}/{item_id}')
-        print(f"Subscription Manager: https://vrf.chain.link/rinkeby/{resonance_token.s_subscriptionId()}")
+        print(f'The contract has been successfully deployed at https://testnets.opensea.io/assets/goerli/{resonance_token}/{item_id-1}')
+        print(f"Subscription Manager: https://vrf.chain.link/goerli/{resonance_token.s_subscriptionId()}")
     return resonance_token
 
 def main():

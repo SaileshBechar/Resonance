@@ -78,20 +78,22 @@ pip install python-dotenv</code></pre>
 												<p>Clone <a href="https://github.com/SaileshBechar/Resonance">https://github.com/SaileshBechar/Resonance</a></p>
 											</li>
 											<li>
-												<p>Create a .env file with contents:</p>
+												<p>In the project directory, create a .env file that contains:</p>
 												<pre><code>PRIVATE_KEY=your wallet private key here</code></pre>
+												<p>Create an API key at Infura.com and add the Goerli key to the .env file</p>
+												<pre><code>WEB3_INFURA_PROJECT_ID=your goerli infura key here</code></pre>
 											</li>
 											<li>
 												<p>Run the experiments from the project directory</p>
-												<pre><code>brownie test</code></pre>
+												<pre><code>brownie test --network goerli</code></pre>
 											</li>
 											<li>
 												<p>
-													Alternatively, just run the unit test
+													Alternatively, just run the singular unit test
 												</p>
-												<pre><code>brownie test -k test_can_create_and_cleanup_collectible</code></pre>
+												<pre><code>brownie test --network goerli -k test_can_create_and_cleanup_collectible</code></pre>
 												<p>and the Popularity test</p>
-												<pre><code>brownie test -k test_popularity</code></pre>
+												<pre><code>brownie test --network goerli -k test_popularity</code></pre>
 											</li>
 										</ul>
 									</div>
