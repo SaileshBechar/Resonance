@@ -25,6 +25,7 @@ def deploy_resonance():
     else:
         print(f'The contract has been successfully deployed at https://testnets.opensea.io/assets/goerli/{resonance_token}/{item_id-1}')
         print(f"Subscription Manager: https://vrf.chain.link/goerli/{resonance_token.s_subscriptionId()}")
+        print(f'View on Etherscan: https://goerli.etherscan.io/address/{resonance_token}')
     return resonance_token
 
 def main():

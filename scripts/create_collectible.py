@@ -22,7 +22,7 @@ def main():
     print("Scarcity of item {} is {}".format(item_id, scarcity))
 
 def generateRandomNums(deployerAddress, resonance_token):
-    tx_top = resonance_token.topUpSubscription(Web3.toWei(2, "ether"), {"from":deployerAddress})
+    tx_top = resonance_token.topUpSubscription(Web3.toWei(12, "ether"), {"from":deployerAddress})
     tx_top.wait(1)
     tx_rand = resonance_token.generateRandomWords({"from":deployerAddress})
     tx_rand.wait(1)

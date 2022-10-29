@@ -122,7 +122,7 @@ contract Resonance is ERC1155, VRFConsumerBaseV2 {
         Scarcity scarcity = Scarcity(randomNums[0] % 3);
         itemIdToScarcity[item_counter] = scarcity;
         emit scarcityAssigned(item_counter, scarcity);
-        _mint(msg.sender, item_counter, 1, abi.encodePacked(popularity));
+        _mint(msg.sender, item_counter, 1, "0x0");
         item_counter += 1;
 
         transfer_currency();

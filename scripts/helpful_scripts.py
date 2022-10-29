@@ -39,7 +39,7 @@ def get_contract(contract_name):
     return contract
 
 def fund_with_link(
-    contract_address, account=None, link_token=None, amount=Web3.toWei(2, "ether")
+    contract_address, account=None, link_token=None, amount=Web3.toWei(12, "ether")
 ):
     account = account if account else get_account()
     # link_token = link_token if link_token else get_contract("link_token")
