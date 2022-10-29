@@ -87,13 +87,13 @@ pip install python-dotenv</code></pre>
 											</li>
 											<li>
 												<p>Run the experiments from the project directory</p>
-												<pre><code>brownie test --network goerli</code></pre>
+												<pre><code>brownie test -v -s --network goerli</code></pre>
 												<p>
 													Alternatively, just run the singular unit test
 												</p>
-												<pre><code>brownie test --network goerli -k test_can_create_and_cleanup_collectible</code></pre>
+												<pre><code>brownie test -v -s --network goerli -k test_can_create_and_cleanup_collectible</code></pre>
 												<p>and the Popularity test</p>
-												<pre><code>brownie test --network goerli -k test_popularity</code></pre>
+												<pre><code>brownie test -v -s --network goerli -k test_popularity</code></pre>
 											</li>
 										</ul>
 									</div>
